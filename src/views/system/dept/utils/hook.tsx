@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { addOrUpdateDept, getDeptList } from "@/api/system";
+import { addOrUpdateDept, deleteDept, getDeptList } from "@/api/system";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
@@ -33,11 +33,26 @@ export function useDept() {
       minWidth: 70
     },
     {
+      label: "状态",
+      prop: "status",
+      minWidth: 100,
+      cellRenderer: ({ row, props }) => (
+        <el-tag size={props.size} style={tagStyle.value(row.status)}>
+          {row.status === 1 ? "启用" : "停用"}
+        </el-tag>
+      )
+    },
+    {
       label: "创建时间",
       minWidth: 200,
       prop: "createTime",
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+    },
+    {
+      label: "负责人",
+      prop: "principal",
+      minWidth: 100
     },
     {
       label: "操作",
@@ -148,6 +163,7 @@ export function useDept() {
   }
 
   function handleDelete(row) {
+    deleteDept(row);
     message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
     onSearch();
   }

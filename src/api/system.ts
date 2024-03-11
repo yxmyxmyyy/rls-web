@@ -45,3 +45,8 @@ export const addOrUpdateDept = (data?: object) => {
     data
   });
 };
+
+/** 删除部门 */
+export const deleteDept = (data?: object) => {
+  return http.request<Result>("delete", "/system/warehouse/delete", { data });
+};

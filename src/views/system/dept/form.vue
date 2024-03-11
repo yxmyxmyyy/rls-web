@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ReCol from "@/components/ReCol";
 import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
@@ -8,6 +8,7 @@ import { usePublicHooks } from "../hooks";
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     higherDeptOptions: [],
+    id: 0,
     parentId: 0,
     name: "",
     principal: "",
@@ -18,7 +19,6 @@ const props = withDefaults(defineProps<FormProps>(), {
     type: 1
   })
 });
-
 
 const ruleFormRef = ref();
 const { switchStyle } = usePublicHooks();
@@ -35,16 +35,21 @@ function handleCascaderChange(selectedPath) {
   // 获取最后一个选中的项
   if (selectedPath != null) {
     const lastSelectedItem = selectedPath.length;
-    if (lastSelectedItem == 1) {
-      type = 2;
-    } else if (lastSelectedItem == 2) {
-      type = 3;
-    } else if (lastSelectedItem == 3) {
-      type = 4;
-    }
+    convertType(lastSelectedItem);
+    newFormInline.value.parentId = selectedPath[selectedPath.length - 1];
+  }
+}
+
+function convertType(lastSelectedItem) {
+  let type = 1;
+  if (lastSelectedItem == 1) {
+    type = 2;
+  } else if (lastSelectedItem == 2) {
+    type = 3;
+  } else if (lastSelectedItem == 3) {
+    type = 4;
   }
   newFormInline.value.type = type;
-  newFormInline.value.parentId = selectedPath[selectedPath.length - 1];
 }
 
 const convertTypeToText = type => {
@@ -61,6 +66,9 @@ const convertTypeToText = type => {
 };
 
 defineExpose({ getRef });
+onMounted(async () => {
+  parentId1.value = newFormInline.value.parentId;
+});
 </script>
 
 <template>
