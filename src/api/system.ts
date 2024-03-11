@@ -9,29 +9,39 @@ type ResultTable = {
   success: boolean;
   data?: {
     /** 列表数据 */
-    list: Array<any>;
+    records: Array<any>;
     /** 总条目数 */
     total?: number;
     /** 每页显示条目个数 */
-    pageSize?: number;
+    size?: number;
     /** 当前页数 */
-    currentPage?: number;
+    current?: number;
   };
 };
 
 /** 获取用户管理列表 */
-export const getUserList = (data?: object) => {
-  return http.request<ResultTable>("post", "/user", { data });
+export const getUserList = (
+  data?: object,
+  pageNum?: number,
+  pageSize?: number
+) => {
+  return http.request<ResultTable>(
+    "post",
+    "/system/user/find?pageNum=" + pageNum + "&pageSize=" + pageSize,
+    { data }
+  );
 };
 
-/** 用户管理-获取所有角色列表 */
-export const getAllRoleList = () => {
-  return http.request<Result>("get", "/list-all-role");
+/** 批量删除用户 */
+export const deleteUsers = (data?: object) => {
+  return http.request<Result>("delete", "/system/user/delete", { data });
 };
 
-/** 用户管理-根据userId，获取对应角色id列表（userId：用户id） */
-export const getRoleIds = (data?: object) => {
-  return http.request<Result>("post", "/list-role-ids", { data });
+/** 删除单个用户 */
+export const deleteUser = id => {
+  return http.request<Result>("delete", "/system/user/deleteOne/" + id, {
+    withCredentials: true
+  });
 };
 
 /** 获取部门管理列表 */

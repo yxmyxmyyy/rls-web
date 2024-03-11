@@ -11,10 +11,9 @@ import type { PaginationProps } from "@pureadmin/table";
 import type { FormItemProps, RoleFormItemProps } from "../utils/types";
 import { hideTextAtIndex, getKeyList, isAllEmpty } from "@pureadmin/utils";
 import {
-  getRoleIds,
   getDeptList,
   getUserList,
-  getAllRoleList
+  deleteUsers, deleteUser
 } from "@/api/system";
 import {
   ElForm,
@@ -37,7 +36,7 @@ import {
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
     // 左侧部门树的id
-    deptId: "",
+    warehouseId: "",
     username: "",
     phone: "",
     status: ""
@@ -47,7 +46,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const dataList = ref([]);
   const loading = ref(true);
   // 上传头像信息
-  const avatarInfo = ref();
   const switchLoadMap = ref({});
   const { switchStyle } = usePublicHooks();
   const higherDeptOptions = ref();
@@ -73,27 +71,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       width: 90
     },
     {
-      label: "用户头像",
-      prop: "avatar",
-      cellRenderer: ({ row }) => (
-        <el-image
-          fit="cover"
-          preview-teleported={true}
-          src={row.avatar}
-          preview-src-list={Array.of(row.avatar)}
-          class="w-[24px] h-[24px] rounded-full align-middle"
-        />
-      ),
-      width: 90
-    },
-    {
       label: "用户名称",
       prop: "username",
-      minWidth: 130
-    },
-    {
-      label: "用户昵称",
-      prop: "nickname",
       minWidth: 130
     },
     {
@@ -109,11 +88,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           {row.sex === 1 ? "女" : "男"}
         </el-tag>
       )
-    },
-    {
-      label: "部门",
-      prop: "dept.name",
-      minWidth: 90
     },
     {
       label: "手机号码",
@@ -225,16 +199,22 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   function handleDelete(row) {
-    message(`您删除了用户编号为${row.id}的这条数据`, { type: "success" });
-    onSearch();
+    deleteUser(row.id).then(r => {
+      if (r) {
+        message(`您删除了用户编号为 ${row.id} 的这条数据`, { type: "success" });
+        onSearch();
+      }
+    });
   }
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    pagination.pageSize = val;
+    onSearch();
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    pagination.currentPage = val;
+    onSearch();
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */
@@ -256,19 +236,31 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
     // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
-      type: "success"
+    deleteUsers(getKeyList(curSelected, "id")).then(r => {
+      if (!r) {
+        message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
+          type: "success"
+        });
+      } else {
+        message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
+          type: "success"
+        });
+      }
     });
     tableRef.value.getTableRef().clearSelection();
   }
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getUserList(toRaw(form));
-    dataList.value = data.list;
+    const { data } = await getUserList(
+      toRaw(form),
+      pagination.currentPage,
+      pagination.pageSize
+    );
+    dataList.value = data.records;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    pagination.pageSize = data.size;
+    pagination.currentPage = data.current;
 
     setTimeout(() => {
       loading.value = false;
@@ -278,13 +270,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    form.deptId = "";
+    form.warehouseId = "";
     treeRef.value.onTreeReset();
     onSearch();
   };
 
   function onTreeSelect({ id, selected }) {
-    form.deptId = selected ? id : "";
+    form.warehouseId = selected ? id : "";
     onSearch();
   }
 
@@ -307,7 +299,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         formInline: {
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          parentId: row?.dept.id ?? 0,
           nickname: row?.nickname ?? "",
           username: row?.username ?? "",
           password: row?.password ?? "",
@@ -431,33 +422,33 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  /** 分配角色 */
-  async function handleRole(row) {
-    // 选中的角色列表
-    const ids = (await getRoleIds({ userId: row.id })).data ?? [];
-    addDialog({
-      title: `分配 ${row.username} 用户的角色`,
-      props: {
-        formInline: {
-          username: row?.username ?? "",
-          nickname: row?.nickname ?? "",
-          roleOptions: roleOptions.value ?? [],
-          ids
-        }
-      },
-      width: "400px",
-      draggable: true,
-      fullscreenIcon: true,
-      closeOnClickModal: false,
-      contentRenderer: () => h(roleForm),
-      beforeSure: (done, { options }) => {
-        const curData = options.props.formInline as RoleFormItemProps;
-        console.log("curIds", curData.ids);
-        // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
-        done(); // 关闭弹框
-      }
-    });
-  }
+  // /** 分配角色 */
+  // async function handleRole(row) {
+  //   // 选中的角色列表
+  //   const ids = (await getRoleIds({ userId: row.id })).data ?? [];
+  //   addDialog({
+  //     title: `分配 ${row.username} 用户的角色`,
+  //     props: {
+  //       formInline: {
+  //         username: row?.username ?? "",
+  //         nickname: row?.nickname ?? "",
+  //         roleOptions: roleOptions.value ?? [],
+  //         ids
+  //       }
+  //     },
+  //     width: "400px",
+  //     draggable: true,
+  //     fullscreenIcon: true,
+  //     closeOnClickModal: false,
+  //     contentRenderer: () => h(roleForm),
+  //     beforeSure: (done, { options }) => {
+  //       const curData = options.props.formInline as RoleFormItemProps;
+  //       console.log("curIds", curData.ids);
+  //       // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
+  //       done(); // 关闭弹框
+  //     }
+  //   });
+  // }
 
   onMounted(async () => {
     treeLoading.value = true;
@@ -469,8 +460,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     treeData.value = handleTree(data);
     treeLoading.value = false;
 
-    // 角色列表
-    roleOptions.value = (await getAllRoleList()).data;
+    // // 角色列表
+    // roleOptions.value = (await getAllRoleList()).data;
   });
 
   return {
@@ -491,7 +482,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     handleUpdate,
     handleDelete,
     handleReset,
-    handleRole,
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,

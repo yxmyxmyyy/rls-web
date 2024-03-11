@@ -32,24 +32,21 @@ const parentId1 = ref(0);
 // 定义处理Cascader变化的方法
 function handleCascaderChange(selectedPath) {
   let type = 1;
+  let parentId = 0;
   // 获取最后一个选中的项
   if (selectedPath != null) {
     const lastSelectedItem = selectedPath.length;
-    convertType(lastSelectedItem);
-    newFormInline.value.parentId = selectedPath[selectedPath.length - 1];
-  }
-}
-
-function convertType(lastSelectedItem) {
-  let type = 1;
-  if (lastSelectedItem == 1) {
-    type = 2;
-  } else if (lastSelectedItem == 2) {
-    type = 3;
-  } else if (lastSelectedItem == 3) {
-    type = 4;
+    parentId = selectedPath[selectedPath.length - 1];
+    if (lastSelectedItem == 1) {
+      type = 2;
+    } else if (lastSelectedItem == 2) {
+      type = 3;
+    } else if (lastSelectedItem == 3) {
+      type = 4;
+    }
   }
   newFormInline.value.type = type;
+  newFormInline.value.parentId = parentId;
 }
 
 const convertTypeToText = type => {
