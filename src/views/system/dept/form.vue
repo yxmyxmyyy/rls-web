@@ -68,6 +68,7 @@ const convertTypeToText = type => {
 defineExpose({ getRef });
 onMounted(() => {
   parentId1.value = newFormInline.value.parentId;
+  console.log(parentId1.value);
 });
 </script>
 
