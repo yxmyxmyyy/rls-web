@@ -40,7 +40,6 @@ const {
   handleUpdate,
   handleDelete,
   handleReset,
-  handleRole,
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
@@ -223,7 +222,6 @@ const {
                         type="primary"
                         :size="size"
                         :icon="useRenderIcon(Role)"
-                        @click="handleRole(row)"
                       >
                         分配角色
                       </el-button>

@@ -6,7 +6,6 @@ import { RoleFormProps } from "../utils/types";
 const props = withDefaults(defineProps<RoleFormProps>(), {
   formInline: () => ({
     username: "",
-    nickname: "",
     roleOptions: [],
     ids: []
   })

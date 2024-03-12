@@ -32,6 +32,19 @@ export const getUserList = (
   );
 };
 
+/** 新增用户 */
+export const addOrUpdateUser = (data?: object) => {
+  return http.request<Result>("post", "/system/user/saveOrUpdate", {
+    data
+  });
+};
+
+/** 修改用户 */
+export const updateUser = (data?: object) => {
+  return http.request<Result>("put", "/system/user/update", { data });
+};
+
+
 /** 批量删除用户 */
 export const deleteUsers = (data?: object) => {
   return http.request<Result>("delete", "/system/user/delete", { data });

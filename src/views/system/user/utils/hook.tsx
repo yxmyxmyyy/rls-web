@@ -13,7 +13,11 @@ import { hideTextAtIndex, getKeyList, isAllEmpty } from "@pureadmin/utils";
 import {
   getDeptList,
   getUserList,
-  deleteUsers, deleteUser
+  deleteUsers,
+  deleteUser,
+  addOrUpdateDept,
+  addOrUpdateUser,
+  updateUser
 } from "@/api/system";
 import {
   ElForm,
@@ -32,6 +36,7 @@ import {
   reactive,
   onMounted
 } from "vue";
+import {REGEXP_PWD} from "@/views/system/user/utils/rule";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -241,10 +246,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
           type: "success"
         });
+        onSearch();
       } else {
         message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
           type: "success"
         });
+        onSearch();
       }
     });
     tableRef.value.getTableRef().clearSelection();
@@ -299,14 +306,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         formInline: {
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          nickname: row?.nickname ?? "",
           username: row?.username ?? "",
           password: row?.password ?? "",
+          warehouseId: row?.warehouseId ?? "",
+          role: row?.role ?? "",
           phone: row?.phone ?? "",
-          email: row?.email ?? "",
           sex: row?.sex ?? "",
           status: row?.status ?? 1,
-          remark: row?.remark ?? ""
+          id: row?.id ?? ""
         }
       },
       width: "46%",
@@ -317,23 +324,63 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
-            type: "success"
-          });
+        function chores(r) {
+          if (r) {
+            message(`您${title}了用户名称为${curData.username}的这条数据`, {
+              type: "success"
+            });
+          }
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
         FormRef.validate(valid => {
           if (valid) {
-            console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              chores();
+              addOrUpdateUser(curData)
+                .then(r => {
+                  chores(r);
+                })
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
+                });
+              // ;
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              chores();
+              updateUser(curData)
+                .then(r => {
+                  chores(r);
+                })
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
+                });
             }
           }
         });
@@ -364,7 +411,19 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
               rules={[
                 {
                   required: true,
-                  message: "请输入新密码",
+                  validator: (rule, value, callback) => {
+                    if (value === "") {
+                      callback(new Error("请输入密码"));
+                    } else if (!REGEXP_PWD.test(value)) {
+                      callback(
+                        new Error(
+                          "密码格式应为8-18位数字、字母、符号的任意两种组合"
+                        )
+                      );
+                    } else {
+                      callback();
+                    }
+                  },
                   trigger: "blur"
                 }
               ]}
@@ -408,11 +467,34 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: done => {
         ruleFormRef.value.validate(valid => {
           if (valid) {
-            // 表单规则校验通过
-            message(`已成功重置 ${row.username} 用户的密码`, {
-              type: "success"
-            });
-            console.log(pwdForm.newPwd);
+            updateUser({
+              password: pwdForm.newPwd,
+              id: row.id
+            })
+              .then(() => {
+                message(`已成功重置 ${row.username} 用户的密码`, {
+                  type: "success"
+                });
+              })
+              .catch(error => {
+                // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                let errorMessage = "操作失败，请重试"; // 默认错误消息
+                if (
+                  error &&
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.msg
+                ) {
+                  errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                }
+                // 使用你的消息弹出库显示错误
+                message(
+                  `您重置 ${row.username} 用户的密码失败: ${errorMessage}`,
+                  {
+                    type: "error"
+                  }
+                );
+              });
             // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
             done(); // 关闭弹框
             onSearch(); // 刷新表格数据

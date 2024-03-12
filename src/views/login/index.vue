@@ -43,7 +43,10 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
+        .loginByUsername({
+          username: ruleForm.username,
+          password: ruleForm.password
+        })
         .then(res => {
           if (res.success) {
             // 获取后端路由
@@ -52,6 +55,24 @@ const onLogin = async (formEl: FormInstance | undefined) => {
               message("登录成功", { type: "success" });
             });
           }
+        })
+        .catch(error => {
+          // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+          let errorMessage = "操作失败，请重试"; // 默认错误消息
+          if (
+            error &&
+            error.response &&
+            error.response.data &&
+            error.response.data.msg
+          ) {
+            errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+          }
+          // 使用你的消息弹出库显示错误
+          message(`登录失败: ${errorMessage}`, {
+            type: "error"
+          });
+          loading.value = false;
+          return fields;
         });
     } else {
       loading.value = false;

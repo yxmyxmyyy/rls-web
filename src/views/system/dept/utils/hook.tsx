@@ -146,14 +146,49 @@ export function useDept() {
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              addOrUpdateDept(curData).then(r => {
-                chores(r);
-              });
+              addOrUpdateDept(curData)
+                .then(r => {
+                  chores(r);
+                })
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
+                });
+              // ;
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              addOrUpdateDept(curData).then(r => {
-                chores(r);
-              });
+              addOrUpdateDept(curData)
+                .then(r => {
+                  chores(r);
+                })
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
+                });
             }
           }
         });
@@ -162,9 +197,12 @@ export function useDept() {
   }
 
   function handleDelete(row) {
-    deleteDept(row);
-    message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
-    onSearch();
+    deleteDept(row).then(r => {
+      if (r) {
+        message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
+        onSearch();
+      }
+    });
   }
 
   onMounted(() => {
