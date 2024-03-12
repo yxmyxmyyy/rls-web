@@ -135,7 +135,7 @@ export function useDept() {
             });
           } else {
             message(`您${title}数据失败`, {
-              type: "success"
+              type: "error"
             });
           }
           done(); // 关闭弹框
@@ -143,7 +143,6 @@ export function useDept() {
         }
         FormRef.validate(valid => {
           if (valid) {
-            console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
