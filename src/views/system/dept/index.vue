@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useDept } from "./utils/hook";
-import { PureTableBar } from "@/components/RePureTableBar";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import {ref} from "vue";
+import {useDept} from "./utils/hook";
+import {PureTableBar} from "@/components/RePureTableBar";
+import {useRenderIcon} from "@/components/ReIcon/src/hooks";
 
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
@@ -51,8 +51,8 @@ const {
           clearable
           class="!w-[180px]"
         >
-          <el-option label="启用" :value="1" />
-          <el-option label="停用" :value="0" />
+          <el-option label="启用" :value="1"/>
+          <el-option label="停用" :value="0"/>
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -122,7 +122,7 @@ const {
               type="primary"
               :size="size"
               :icon="useRenderIcon(AddFill)"
-              @click="openDialog('新增', { parentId: row.id } as any)"
+              @click="openDialog('新增', {parentId:row.id, type:row.type+1} as any)"
             >
               新增
             </el-button>
