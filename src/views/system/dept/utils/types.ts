@@ -9,6 +9,8 @@ interface FormItemProps {
   status: number;
   remark: string;
   type: number;
+  lng: number;
+  lat: number;
 }
 interface FormProps {
   formInline: FormItemProps;

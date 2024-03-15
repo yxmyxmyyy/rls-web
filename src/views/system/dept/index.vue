@@ -24,7 +24,8 @@ const {
   resetForm,
   openDialog,
   handleDelete,
-  handleSelectionChange
+  handleSelectionChange,
+  openMap
 } = useDept();
 </script>
 
@@ -106,6 +107,16 @@ const {
           @selection-change="handleSelectionChange"
         >
           <template #operation="{ row }">
+            <el-button
+              class="reset-margin"
+              link
+              type="primary"
+              :size="size"
+              :icon="useRenderIcon(EditPen)"
+              @click="openMap(row)"
+            >
+              位置
+            </el-button>
             <el-button
               class="reset-margin"
               link

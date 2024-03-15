@@ -83,5 +83,11 @@
       <div class="loader"></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
+    <!-- 解决逆地理编码，根据经纬度获取地址信息 -->
+    <script type="text/javascript">
+      window._AMapSecurityConfig = {
+        securityJsCode: 'e536c476e429b24095fb5165655da8e1', //所申请的安全密钥 注意这是安全密钥而不是key
+      }
+    </script>
   </body>
 </html>

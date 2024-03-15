@@ -26,6 +26,15 @@ export default {
         title: "部门管理",
         roles: ["0"]
       }
+    },
+    {
+      path: "/able/map",
+      name: "MapPage",
+      component: () => import("@/views/system/dept/map.vue"),
+      meta: {
+        title: "地图",
+        icon: "ri:git-branch-line"
+      }
     }
   ]
 };
