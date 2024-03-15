@@ -161,7 +161,6 @@ export function useDept() {
               let placeSearch = new AMap.PlaceSearch({
                 map: map
               });
-              console.log(autocomplete);
               autocomplete.on("select", select); //注册监听，当选中某条记录时会触发
               function select(e) {
                 placeSearch.setCity(e.poi.adcode);

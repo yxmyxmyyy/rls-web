@@ -1,6 +1,5 @@
 import "./reset.css";
 import dayjs from "dayjs";
-import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
@@ -8,35 +7,34 @@ import { message } from "@/utils/message";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import type { FormItemProps, RoleFormItemProps } from "../utils/types";
-import { hideTextAtIndex, getKeyList, isAllEmpty } from "@pureadmin/utils";
+import type { FormItemProps } from "../utils/types";
+import { getKeyList, hideTextAtIndex, isAllEmpty } from "@pureadmin/utils";
 import {
+  addOrUpdateUser,
+  deleteUser,
+  deleteUsers,
   getDeptList,
   getUserList,
-  deleteUsers,
-  deleteUser,
-  addOrUpdateDept,
-  addOrUpdateUser,
   updateUser
 } from "@/api/system";
 import {
   ElForm,
-  ElInput,
   ElFormItem,
-  ElProgress,
-  ElMessageBox
+  ElInput,
+  ElMessageBox,
+  ElProgress
 } from "element-plus";
 import {
-  type Ref,
-  h,
-  ref,
-  toRaw,
-  watch,
   computed,
+  h,
+  onMounted,
   reactive,
-  onMounted
+  ref,
+  type Ref,
+  toRaw,
+  watch
 } from "vue";
-import {REGEXP_PWD} from "@/views/system/user/utils/rule";
+import { REGEXP_PWD } from "@/views/system/user/utils/rule";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -155,7 +153,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   ];
   // 当前密码强度（0-4）
   const curScore = ref();
-  const roleOptions = ref([]);
 
   function onChange({ row, index }) {
     ElMessageBox.confirm(
@@ -324,6 +321,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
+
         function chores(r) {
           if (r) {
             message(`您${title}了用户名称为${curData.username}的这条数据`, {
@@ -333,6 +331,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
+
         FormRef.validate(valid => {
           if (valid) {
             // 表单规则校验通过
