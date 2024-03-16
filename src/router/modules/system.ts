@@ -30,7 +30,7 @@ export default {
     {
       path: "/able/map",
       name: "MapPage",
-      component: () => import("@/views/system/dept/map.vue"),
+      component: () => import("@/views/system/map/map.vue"),
       meta: {
         title: "地图",
         icon: "ri:git-branch-line"

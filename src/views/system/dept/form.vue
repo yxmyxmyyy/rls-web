@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import {onMounted, ref} from "vue";
 import ReCol from "@/components/ReCol";
-import { formRules } from "./utils/rule";
-import { FormProps } from "./utils/types";
-import { usePublicHooks } from "../hooks";
+import {formRules} from "./utils/rule";
+import {FormProps} from "./utils/types";
+import {usePublicHooks} from "../hooks";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
@@ -16,12 +16,14 @@ const props = withDefaults(defineProps<FormProps>(), {
     sort: 0,
     status: 1,
     remark: "",
-    type: 1
+    type: 1,
+    lat: 0,
+    lng: 0
   })
 });
 
 const ruleFormRef = ref();
-const { switchStyle } = usePublicHooks();
+const {switchStyle} = usePublicHooks();
 const newFormInline = ref(props.formInline);
 
 function getRef() {
@@ -29,6 +31,7 @@ function getRef() {
 }
 
 const parentId1 = ref(0);
+
 // 定义处理Cascader变化的方法
 function handleCascaderChange(selectedPath) {
   let type = 1;
@@ -62,7 +65,7 @@ const convertTypeToText = type => {
   }
 };
 
-defineExpose({ getRef });
+defineExpose({getRef});
 onMounted(() => {
   parentId1.value = newFormInline.value.parentId;
 });
