@@ -12,7 +12,7 @@ export const formRules = reactive(<FormRules>{
         if (value === 1 || value === 2 || value === 3) {
           callback();
         } else {
-          callback(new Error("请输入正确的手机号码格式"));
+          callback(new Error("类型只能为县,乡,村"));
         }
       },
       trigger: "click"

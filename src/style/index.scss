@@ -24,3 +24,8 @@
 .html-weakness {
   filter: invert(80%);
 }
+
+/* 高德地图 */
+.amap-sug-result {
+  z-index: 2999 !important;
+}

@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<FormProps>(), {
 });
 
 const ruleFormRef = ref();
-const {switchStyle} = usePublicHooks();
+const { switchStyle } = usePublicHooks();
 const newFormInline = ref(props.formInline);
 
 function getRef() {
@@ -65,7 +65,7 @@ const convertTypeToText = type => {
   }
 };
 
-defineExpose({getRef});
+defineExpose({ getRef });
 onMounted(() => {
   parentId1.value = newFormInline.value.parentId;
 });

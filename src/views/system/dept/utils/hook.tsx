@@ -1,16 +1,14 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
 import mapForm from "../map.vue";
-import {handleTree} from "@/utils/tree";
-import {message} from "@/utils/message";
-import {addOrUpdateDept, deleteDept, getDeptList} from "@/api/system";
-import {usePublicHooks} from "../../hooks";
-import {addDialog} from "@/components/ReDialog";
-import {h, onMounted, reactive, ref} from "vue";
-import type {FormItemProps} from "../utils/types";
-import {cloneDeep, isAllEmpty} from "@pureadmin/utils";
-import AMapLoader from "@amap/amap-jsapi-loader";
-import house from "@/assets/house.png";
+import { handleTree } from "@/utils/tree";
+import { message } from "@/utils/message";
+import { addOrUpdateDept, deleteDept, getDeptList } from "@/api/system";
+import { usePublicHooks } from "../../hooks";
+import { addDialog } from "@/components/ReDialog";
+import { h, onMounted, reactive, ref } from "vue";
+import type { FormItemProps } from "../utils/types";
+import { cloneDeep, isAllEmpty } from "@pureadmin/utils";
 
 export function useDept() {
   const form = reactive({
@@ -18,10 +16,11 @@ export function useDept() {
     status: null
   });
 
+  const mapRef = ref();
   const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
-  const {tagStyle} = usePublicHooks();
+  const { tagStyle } = usePublicHooks();
 
   const columns: TableColumnList = [
     {
@@ -39,7 +38,7 @@ export function useDept() {
       label: "状态",
       prop: "status",
       minWidth: 100,
-      cellRenderer: ({row, props}) => (
+      cellRenderer: ({ row, props }) => (
         <el-tag size={props.size} style={tagStyle.value(row.status)}>
           {row.status === 1 ? "启用" : "停用"}
         </el-tag>
@@ -49,7 +48,7 @@ export function useDept() {
       label: "创建时间",
       minWidth: 200,
       prop: "createTime",
-      formatter: ({createTime}) =>
+      formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
@@ -77,7 +76,7 @@ export function useDept() {
 
   async function onSearch() {
     loading.value = true;
-    const {data} = await getDeptList(); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
+    const { data } = await getDeptList(); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
     let newData = data;
     if (!isAllEmpty(form.name)) {
       // 前端搜索部门名称
@@ -124,7 +123,54 @@ export function useDept() {
           lat: row?.lat ?? 0
         }
       },
-      contentRenderer: () => h(mapForm, {ref: formRef}),
+      draggable: true,
+      fullscreenIcon: true,
+      closeOnClickModal: false,
+      contentRenderer: () => h(mapForm, { ref: mapRef }),
+      beforeSure: done => {
+        const MapRef = mapRef.value.getRef();
+        console.log(MapRef);
+        function chores(r) {
+          if (r) {
+            message(`您修改了部门名称为${row.name}的这条数据`, {
+              type: "success"
+            });
+          } else {
+            message(`您修改数据失败`, {
+              type: "error"
+            });
+          }
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+
+        // 实际开发先调用新增接口，再进行下面操作
+        addOrUpdateDept({
+          id: row.id,
+          type: row.type,
+          lng: MapRef.lng,
+          lat: MapRef.lat
+        })
+          .then(r => {
+            chores(r);
+          })
+          .catch(error => {
+            // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+            let errorMessage = "操作失败，请重试"; // 默认错误消息
+            if (
+              error &&
+              error.response &&
+              error.response.data &&
+              error.response.data.msg
+            ) {
+              errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+            }
+            // 使用你的消息弹出库显示错误
+            message(`您修改数据失败: ${errorMessage}`, {
+              type: "error"
+            });
+          });
+      }
     });
   }
 
@@ -151,8 +197,8 @@ export function useDept() {
       draggable: true,
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(editForm, {ref: formRef}),
-      beforeSure: (done, {options}) => {
+      contentRenderer: () => h(editForm, { ref: formRef }),
+      beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
 
@@ -228,7 +274,7 @@ export function useDept() {
   function handleDelete(row) {
     deleteDept(row).then(r => {
       if (r) {
-        message(`您删除了部门名称为${row.name}的这条数据`, {type: "success"});
+        message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
         onSearch();
       }
     });
