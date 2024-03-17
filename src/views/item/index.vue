@@ -4,6 +4,8 @@ import { useAccount } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
+import Password from "@iconify-icons/ri/lock-password-line";
+import More from "@iconify-icons/ep/more-filled";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import Search from "@iconify-icons/ep/search";
@@ -23,10 +25,12 @@ const {
   dataList,
   selectedNum,
   pagination,
+  buttonClass,
   onSearch,
   resetForm,
   onbatchDel,
   openDialog,
+  handleUpdate,
   handleDelete,
   handleSizeChange,
   onSelectionCancel,
@@ -34,7 +38,6 @@ const {
   handleSelectionChange
 } = useAccount(tableRef);
 </script>
-
 <template>
   <div class="main">
     <el-form
@@ -43,26 +46,26 @@ const {
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="学生账号：" prop="username">
+      <el-form-item label="库存id：" prop="productId">
         <el-input
-          v-model="form.username"
-          placeholder="请输入用户账号"
+          v-model="form.itemId"
+          placeholder="请输入库存id"
           clearable
           class="!w-[160px]"
         />
       </el-form-item>
-      <el-form-item label="学生姓名：" prop="name">
+      <el-form-item label="产品id：" prop="productId">
         <el-input
-          v-model="form.name"
-          placeholder="请输入姓名"
+          v-model="form.productId"
+          placeholder="请输入产品id"
           clearable
           class="!w-[160px]"
         />
       </el-form-item>
-      <el-form-item label="学生姓名：" prop="name">
+      <el-form-item label="产品名称：" prop="productName">
         <el-input
-          v-model="form.name"
-          placeholder="请输入姓名"
+          v-model="form.productName"
+          placeholder="请输入产品名称"
           clearable
           class="!w-[160px]"
         />
@@ -82,14 +85,21 @@ const {
       </el-form-item>
     </el-form>
 
-    <PureTableBar title="学科信息管理" :columns="columns" @refresh="onSearch">
+    <PureTableBar title="库存管理" :columns="columns" @refresh="onSearch">
       <template #buttons>
         <el-button
           type="primary"
           :icon="useRenderIcon(AddFill)"
-          @click="openDialog()"
+          @click="openDialog('入库')"
         >
-          新增学科信息
+          入库
+        </el-button>
+        <el-button
+          type="primary"
+          :icon="useRenderIcon(AddFill)"
+          @click="openDialog('出库')"
+        >
+          出库
         </el-button>
       </template>
       <template v-slot="{ size, dynamicColumns }">
@@ -136,18 +146,8 @@ const {
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
-            <el-button
-              class="reset-margin"
-              link
-              type="primary"
-              :size="size"
-              :icon="useRenderIcon(EditPen)"
-              @click="openDialog('编辑', row)"
-            >
-              修改
-            </el-button>
             <el-popconfirm
-              :title="`是否确认删除用户编号为${row.id}的这条数据`"
+              :title="`是否确认删除用户编号为${row.productId}的这条数据`"
               @confirm="handleDelete(row)"
             >
               <template #reference>

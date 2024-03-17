@@ -1,29 +1,30 @@
+import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
-import { computed, h, onMounted, reactive, ref, type Ref } from "vue";
+import { computed, h, onMounted, reactive, ref, type Ref, toRaw } from "vue";
 import {
-  subjectDelete,
+  addOrUpdateItem,
+  addOrUpdateProduct, deductStockItem,
+  deleteProduct,
+  deleteProducts,
   itemFind,
-  subjectInsert,
-  subjectUpdate
+  productFindAll
 } from "@/api/item";
-import dayjs from "dayjs";
+import { getKeyList } from "@pureadmin/utils";
 
 export function useAccount(tableRef: Ref) {
-  const teacherList = ref();
-  const subjectnameList = ref();
-  const classList = ref();
+  const productList = ref();
   const formRef = ref();
   const dataList = ref([]);
   const loading = ref(true);
   const selectedNum = ref(0);
   const form = reactive({
-    username: "",
-    name: "",
-    sex: null
+    itemId: "",
+    productId: "",
+    productName: ""
   });
   const pagination = reactive<PaginationProps>({
     total: 0,
@@ -60,15 +61,15 @@ export function useAccount(tableRef: Ref) {
     },
     {
       label: "更新时间",
+      minWidth: 90,
       prop: "lastUpdated",
-      minWidth: 130,
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
       fixed: "right",
-      width: 180,
+      width: 70,
       slot: "operation"
     }
   ];
@@ -87,9 +88,11 @@ export function useAccount(tableRef: Ref) {
   }
 
   function handleDelete(row) {
-    subjectDelete(row.id).then(r => {
+    deleteProduct(row.productId).then(r => {
       if (r) {
-        message(`您删除了 ${row.name} 的数据`, { type: "success" });
+        message(`您删除了产品编号为 ${row.productId} 的这条数据`, {
+          type: "success"
+        });
         onSearch();
       }
     });
@@ -105,7 +108,6 @@ export function useAccount(tableRef: Ref) {
   function handleCurrentChange(val: number) {
     pagination.currentPage = val;
     onSearch();
-    console.log(`current page: ${val}`);
   }
 
   /** 当CheckBox选择项发生变化时会触发该事件 */
@@ -126,39 +128,44 @@ export function useAccount(tableRef: Ref) {
   function onbatchDel() {
     // 返回当前选中的行
     const curSelected = tableRef.value.getTableRef().getSelectionRows();
-    for (const i in curSelected) {
-      subjectDelete(curSelected[i].id).then(r => {
-        if (!r) {
-          message(`删除 ${curSelected[i].name} 的数据失败`, {
-            type: "success"
-          });
-        } else {
-          message(`您删除了 ${curSelected[i].name} 的数据`, {
-            type: "success"
-          });
-        }
-      });
-    }
     // 接下来根据实际业务，通过选中行的某项数据，比如下面的id，调用接口进行批量删除
-    // message(`已删除用户编号为 ${getKeyList(curSelected, "id")} 的数据`, {
-    //   type: "success"
-    // });
+    deleteProducts(getKeyList(curSelected, "productId")).then(r => {
+      if (!r) {
+        message(
+          `已删除产品编号为 ${getKeyList(curSelected, "productId")} 的数据`,
+          {
+            type: "success"
+          }
+        );
+        onSearch();
+      } else {
+        message(
+          `已删除产品编号为 ${getKeyList(curSelected, "productId")} 的数据`,
+          {
+            type: "success"
+          }
+        );
+        onSearch();
+      }
+    });
     tableRef.value.getTableRef().clearSelection();
-    onSearch();
   }
 
   async function onSearch() {
     loading.value = true;
-    const { records, total } = await itemFind(
+    const { data } = await itemFind(
+      toRaw(form),
       pagination.currentPage,
       pagination.pageSize
     );
-    dataList.value = records;
-    pagination.total = total;
+    dataList.value = data.records;
+    pagination.total = data.total;
+    pagination.pageSize = data.size;
+    pagination.currentPage = data.current;
 
-    // classList.value = await classesFindAll();
-    // subjectnameList.value = await dictFindAll();
-    // teacherList.value = await teacherFindAll();
+    await productFindAll().then(r => {
+      productList.value = r.data;
+    });
 
     setTimeout(() => {
       loading.value = false;
@@ -173,21 +180,15 @@ export function useAccount(tableRef: Ref) {
 
   function openDialog(title = "新增", row?: FormItemProps) {
     addDialog({
-      title: `${title}用户`,
+      title: `${title}产品`,
       props: {
         formInline: {
           title,
-          id: row?.id ?? null,
-          subjectNameId: row?.subjectNameId ?? null,
-          subjectName: row?.subjectName ?? null,
-          teacherId: row?.teacherId ?? null,
-          teacherName: row?.teacherName ?? null,
-          classId: row?.classId ?? null,
-          className: row?.className ?? null
+          productId: row?.productId ?? "",
+          productName: row?.productName ?? "",
+          weight: row?.weight ?? null
         },
-        classList: classList?.value ?? null,
-        subjectnameList: subjectnameList?.value ?? null,
-        teacherList: teacherList?.value ?? null
+        productList: productList?.value ?? null
       },
       width: "46%",
       draggable: true,
@@ -200,11 +201,7 @@ export function useAccount(tableRef: Ref) {
 
         function chores(r) {
           if (r) {
-            message(`您${title}了用户名称为${curData.id}的这条数据`, {
-              type: "success"
-            });
-          } else {
-            message(`您${title}数据失败`, {
+            message(`您${title}了用户名称为${curData.productName}的这条数据`, {
               type: "success"
             });
           }
@@ -214,22 +211,52 @@ export function useAccount(tableRef: Ref) {
 
         FormRef.validate(valid => {
           if (valid) {
-            console.log("curData", curData);
             // 表单规则校验通过
-            if (title === "新增") {
+            if (title === "入库") {
               // 实际开发先调用新增接口，再进行下面操作
-              subjectInsert(curData)
+              addOrUpdateItem([curData])
                 .then(r => {
                   chores(r);
                 })
-                .catch(e => {
-                  chores(e);
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
                 });
+              // ;
             } else {
-              // 实际开发先调用编辑接口，再进行下面操作
-              subjectUpdate(curData).then(r => {
-                chores(r);
-              });
+              // 实际开发先调用修改接口，再进行下面操作
+              deductStockItem([curData])
+                .then(r => {
+                  chores(r);
+                })
+                .catch(error => {
+                  // 假设后端返回的错误格式为 { message: "这里是错误信息" }
+                  let errorMessage = "操作失败，请重试"; // 默认错误消息
+                  if (
+                    error &&
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.msg
+                  ) {
+                    errorMessage = error.response.data.msg; // 从错误对象中提取错误消息
+                  }
+                  // 使用你的消息弹出库显示错误
+                  message(`您${title}数据失败: ${errorMessage}`, {
+                    type: "error"
+                  });
+                });
             }
           }
         });
@@ -242,6 +269,7 @@ export function useAccount(tableRef: Ref) {
   });
 
   return {
+    productList,
     form,
     loading,
     columns,
@@ -249,9 +277,6 @@ export function useAccount(tableRef: Ref) {
     selectedNum,
     pagination,
     buttonClass,
-    teacherList,
-    subjectnameList,
-    classList,
     onSearch,
     resetForm,
     onbatchDel,

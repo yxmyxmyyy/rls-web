@@ -6,24 +6,20 @@ import { FormProps } from "./utils/types";
 //TODO 表单信息
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
-    id: "",
-    subjectNameId: null,
-    subjectName: "",
-    teacherId: null,
-    teacherName: "",
-    classId: null,
-    className: ""
+    itemId: "",
+    productId: "",
+    productName: "",
+    warehouseId: null,
+    stock: null,
+    lastUpdated: null,
+    weight: null
   }),
-  classList: null,
-  teacherList: null,
-  subjectnameList: null
+  productList: null
 });
 
 const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
-const states1 = ref(props.subjectnameList);
-const states2 = ref(props.teacherList);
-const states3 = ref(props.classList);
+const states = ref(props.productList);
 
 function getRef() {
   return ruleFormRef.value;
@@ -35,41 +31,21 @@ defineExpose({ getRef });
 interface ListItem {
   value: string;
   label: string;
+  name: string;
 }
 
-const list1 = states1.value.map((item): ListItem => {
-  return {
-    value: item.id,
-    label: item.label
-  };
+const list1 = states.value.map((item): ListItem => {
+  const displayText = `${item.productId} - ${item.productName}`;
+  return { value: item.productId, label: displayText, name: item.productName };
 });
 
-const list2 = states2.value.map((item): ListItem => {
-  return {
-    value: item.id,
-    label: item.name
-  };
-});
-
-const list3 = states3.value.map((item): ListItem => {
-  return {
-    value: item.id,
-    label: item.name
-  };
-});
-
-const optionRefSubject = ref();
-const optionRefTeacher = ref();
 const optionRefClass = ref();
-
-function handleChangeSubject() {
-  newFormInline.value.subjectName = optionRefSubject.value.currentPlaceholder;
-}
-function handleChangeTeacher() {
-  newFormInline.value.teacherName = optionRefTeacher.value.currentPlaceholder;
-}
 function handleChangeClass() {
-  newFormInline.value.className = optionRefClass.value.currentPlaceholder;
+  list1.map(item => {
+    if (item.value === newFormInline.value.productId) {
+      newFormInline.value.productName = item.name;
+    }
+  });
 }
 </script>
 
@@ -78,51 +54,22 @@ function handleChangeClass() {
     ref="ruleFormRef"
     :model="newFormInline"
     :rules="formRules"
-    label-width="92px"
+    label-width="82px"
   >
-    <el-form-item label="学科:" prop="subjectNameId">
+    <el-form-item label="产品:" prop="productId">
       <el-select-v2
-        v-model="newFormInline.subjectNameId"
+        ref="optionRefClass"
+        v-model="newFormInline.productId"
         style="width: 240px"
         filterable
         clearable
         :options="list1"
-        ref="optionRefSubject"
-        @change="handleChangeSubject"
-        placeholder="请输入学科"
-      />
-    </el-form-item>
-
-    <el-form-item label="老师:" prop="teacherId">
-      <el-select-v2
-        v-model="newFormInline.teacherId"
-        style="width: 240px"
-        filterable
-        clearable
-        :options="list2"
-        ref="optionRefTeacher"
-        @change="handleChangeTeacher"
-        placeholder="请输入老师"
-      />
-    </el-form-item>
-
-    <el-form-item label="班级:" prop="classId">
-      <el-select-v2
-        v-model="newFormInline.classId"
-        style="width: 240px"
-        filterable
-        clearable
-        :options="list3"
-        ref="optionRefClass"
         @change="handleChangeClass"
-        placeholder="请输入班级"
       />
+    </el-form-item>
+
+    <el-form-item label="数量:" prop="stock">
+      <el-input-number v-model="newFormInline.weight" :min="1" :max="9999" />
     </el-form-item>
   </el-form>
 </template>
-
-<style>
-.el-form-item__label {
-  font-weight: 700;
-}
-</style>

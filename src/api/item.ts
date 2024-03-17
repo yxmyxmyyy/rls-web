@@ -40,6 +40,13 @@ export const addOrUpdateItem = (data?: object) => {
   });
 };
 
+/** 扣减库存  */
+export const deductStockItem = (data?: object) => {
+  return http.request<Result>("put", "/item/item/deductStock", {
+    data
+  });
+};
+
 /** 批量删除库存 */
 export const deleteItems = (data?: object) => {
   return http.request<Result>("delete", "/item/item/delete", { data });
