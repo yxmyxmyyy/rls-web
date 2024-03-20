@@ -33,6 +33,15 @@ export const Transportin = (
   );
 };
 
+/** 结算订单 */
+export const end = id => {
+  return http.request<Result>("put", "/task/Transport/end/" + id, {
+    withCredentials: true
+  });
+};
+
+
+
 /** 出库查询 */
 export const Transportout = (
   data?: object,

@@ -7,14 +7,15 @@ import type { PaginationProps } from "@pureadmin/table";
 import { computed, h, onMounted, reactive, ref, type Ref, toRaw } from "vue";
 import {
   addOrUpdateItem,
-  addOrUpdateProduct, deductStockItem,
+  addOrUpdateProduct,
+  deductStockItem,
   deleteProduct,
   deleteProducts,
   itemFind,
   productFindAll
 } from "@/api/item";
 import { getKeyList } from "@pureadmin/utils";
-import {Transportin} from "@/api/task";
+import { end, Transportin } from "@/api/task";
 
 export function useAccount(tableRef: Ref) {
   const formRef = ref();
@@ -106,6 +107,17 @@ export function useAccount(tableRef: Ref) {
     deleteProduct(row.productId).then(r => {
       if (r) {
         message(`您删除了产品编号为 ${row.productId} 的这条数据`, {
+          type: "success"
+        });
+        onSearch();
+      }
+    });
+  }
+
+  function endTask(row) {
+    end(row.taskId).then(r => {
+      if (r) {
+        message(`您入库了产品编号为 ${row.taskId} 的这条订单`, {
           type: "success"
         });
         onSearch();
@@ -279,6 +291,7 @@ export function useAccount(tableRef: Ref) {
   });
 
   return {
+    endTask,
     form,
     loading,
     columns,

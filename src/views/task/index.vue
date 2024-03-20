@@ -20,6 +20,7 @@ defineOptions({
 const formRef = ref();
 const tableRef = ref();
 const {
+  endTask,
   form,
   loading,
   columns,
@@ -126,16 +127,22 @@ const {
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
-            <el-button
-              class="reset-margin"
-              link
-              type="primary"
-              :size="size"
-              :icon="useRenderIcon(EditPen)"
-              @click="openDialog('修改', row)"
+            <el-popconfirm
+              :title="`是否入库编号为${row.taskId}的这条订单`"
+              @confirm="endTask(row)"
             >
-              入库
-            </el-button>
+              <template #reference>
+                <el-button
+                  class="reset-margin"
+                  link
+                  type="primary"
+                  :size="size"
+                  :icon="useRenderIcon(Delete)"
+                >
+                  入库
+                </el-button>
+              </template>
+            </el-popconfirm>
             <el-popconfirm
               :title="`是否确认删除用户编号为${row.id}的这条数据`"
               @confirm="handleDelete(row)"

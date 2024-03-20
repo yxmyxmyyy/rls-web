@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import editForm from "../form.vue";
+import editForm from "../moreform.vue";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
@@ -7,7 +7,8 @@ import type { PaginationProps } from "@pureadmin/table";
 import { computed, h, onMounted, reactive, ref, type Ref, toRaw } from "vue";
 import {
   addOrUpdateItem,
-  addOrUpdateProduct, deductStockItem,
+  addOrUpdateProduct,
+  deductStockItem,
   deleteProduct,
   deleteProducts,
   itemFind,
@@ -184,6 +185,7 @@ export function useAccount(tableRef: Ref) {
       props: {
         formInline: {
           title,
+          Item: [],
           productId: row?.productId ?? "",
           productName: row?.productName ?? "",
           weight: row?.weight ?? null
@@ -197,8 +199,7 @@ export function useAccount(tableRef: Ref) {
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
-        const curData = options.props.formInline as FormItemProps;
-
+        const curData = options.dynamicValidateForm as FormItemProps;
         function chores(r) {
           if (r) {
             message(`您${title}了用户名称为${curData.productName}的这条数据`, {
