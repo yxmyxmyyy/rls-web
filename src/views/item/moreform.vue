@@ -28,6 +28,7 @@ interface DomainItem {
   key: number;
   productId: string;
   weight: number;
+  productName: string;
 }
 
 const removeDomain = (item: DomainItem) => {
@@ -41,7 +42,8 @@ const addDomain = () => {
   items.value.push({
     key: Date.now(),
     productId: "",
-    weight: 0
+    weight: 0,
+    productName: ""
   });
 };
 
@@ -74,6 +76,15 @@ const list1 = states.value.map((item): ListItem => {
   const displayText = `${item.productId} - ${item.productName}`;
   return { value: item.productId, label: displayText, name: item.productName };
 });
+
+const handleChangeClass = (productId: string, domainItem: DomainItem) => {
+  const selectedItem = props.productList.find(
+    item => item.productId === productId
+  );
+  if (selectedItem) {
+    domainItem.productName = selectedItem.productName;
+  }
+};
 </script>
 
 <template>
@@ -98,6 +109,7 @@ const list1 = states.value.map((item): ListItem => {
           filterable
           clearable
           :options="list1"
+          @change="() => handleChangeClass(domain.productId, domain)"
         />
       </el-form-item>
 
