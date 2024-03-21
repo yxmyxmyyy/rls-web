@@ -202,7 +202,6 @@ export function useAccount(tableRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.itemList;
-        console.log(curData);
         function chores(r) {
           if (r) {
             message(`您${title}了用户名称为${curData.productName}的这条数据`, {
