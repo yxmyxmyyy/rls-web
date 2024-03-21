@@ -21,7 +21,6 @@ const items = ref(props.itemList);
 const states = ref(props.productList);
 
 function getRef() {
-  console.log(states.value);
   return formRef.value;
 }
 
