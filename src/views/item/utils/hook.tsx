@@ -199,7 +199,8 @@ export function useAccount(tableRef: Ref) {
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
-        const curData = options.dynamicValidateForm as FormItemProps;
+        const curData = options.props.productList
+        console.log(curData)
         function chores(r) {
           if (r) {
             message(`您${title}了用户名称为${curData.productName}的这条数据`, {
@@ -215,7 +216,7 @@ export function useAccount(tableRef: Ref) {
             // 表单规则校验通过
             if (title === "入库") {
               // 实际开发先调用新增接口，再进行下面操作
-              addOrUpdateItem([curData])
+              addOrUpdateItem(curData)
                 .then(r => {
                   chores(r);
                 })
@@ -238,7 +239,7 @@ export function useAccount(tableRef: Ref) {
               // ;
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              deductStockItem([curData])
+              deductStockItem(curData)
                 .then(r => {
                   chores(r);
                 })

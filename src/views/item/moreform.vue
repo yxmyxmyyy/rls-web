@@ -1,59 +1,29 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
-import type { FormInstance } from "element-plus";
-import { FormProps } from "@/views/item/utils/types";
+import {ref} from "vue";
+import type {FormInstance} from "element-plus";
+import {FormProps} from "@/views/item/utils/types";
 
 const formRef = ref();
-// const dynamicValidateForm = reactive<{
-//   domains: DomainItem[];
-// }>({
-//   domains: [
-//     {
-//       key: 1,
-//       productId: "",
-//       weight: 0
-//     }
-//   ]
-// });
-
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
-    Item: []
+    productName: "",
+    productId: "",
+    itemId: "",
+    lastUpdated: null,
+    warehouseId: null,
+    stock: null,
+    weight: null
   }),
-  productList: null
-});
-
-// const dynamicValidateForm = reactive<{
-//   domains: props.formInline.Item;
-// }>({
-//   domains: [
-//     {
-//       key: 1,
-//       productId: "",
-//       weight: 0
-//     }
-//   ]
-// });
-
-const dynamicValidateForm = reactive<{
-  domains: props.formInline.Item;
-}>({
-  domains: [
-    {
-      key: 1,
-      productId: "",
-      weight: 0
-    }
-  ]
+  productList: () => ([])
 });
 
 const states = ref(props.productList);
 
 function getRef() {
-  console.log(dynamicValidateForm.domains);
-  console.log(props.formInline);
+  console.log(states.value)
   return formRef.value;
 }
+
 interface DomainItem {
   key: number;
   productId: string;
@@ -61,14 +31,14 @@ interface DomainItem {
 }
 
 const removeDomain = (item: DomainItem) => {
-  const index = dynamicValidateForm.domains.indexOf(item);
+  const index = states.value.indexOf(item);
   if (index !== -1) {
-    dynamicValidateForm.domains.splice(index, 1);
+    states.value.splice(index, 1);
   }
 };
 
 const addDomain = () => {
-  dynamicValidateForm.domains.push({
+  states.value.push({
     key: Date.now(),
     productId: "",
     weight: 0
@@ -79,7 +49,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(valid => {
     if (valid) {
-      getRef();
       console.log("submit!");
     } else {
       console.log("error submit!");
@@ -92,7 +61,8 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
 };
-defineExpose({ getRef });
+defineExpose({getRef});
+
 //远程查询
 interface ListItem {
   value: string;
@@ -102,20 +72,20 @@ interface ListItem {
 
 const list1 = states.value.map((item): ListItem => {
   const displayText = `${item.productId} - ${item.productName}`;
-  return { value: item.productId, label: displayText, name: item.productName };
+  return {value: item.productId, label: displayText, name: item.productName};
 });
 </script>
 
 <template>
   <el-form
     ref="formRef"
-    :model="dynamicValidateForm"
+    :model="states"
     class="demo-dynamic"
     label-width="auto"
     style="max-width: 600px"
   >
     <el-form-item
-      v-for="(domain, index) in dynamicValidateForm.domains"
+      v-for="(domain, index) in states"
       :key="domain.key"
       :label="'Domain' + index"
       :prop="'domains.' + index + '.value'"
@@ -132,10 +102,10 @@ const list1 = states.value.map((item): ListItem => {
       </el-form-item>
 
       <el-form-item label="数量:" prop="weight">
-        <el-input-number v-model="domain.weight" :min="1" :max="9999" />
+        <el-input-number v-model="domain.weight" :min="1" :max="9999"/>
       </el-form-item>
       <el-button class="mt-2" @click.prevent="removeDomain(domain)"
-        >Delete
+      >Delete
       </el-button>
     </el-form-item>
     <el-form-item>
