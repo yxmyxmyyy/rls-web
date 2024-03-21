@@ -17,6 +17,7 @@ import {
 import { getKeyList } from "@pureadmin/utils";
 
 export function useAccount(tableRef: Ref) {
+  const itemList = ref();
   const productList = ref();
   const formRef = ref();
   const dataList = ref([]);
@@ -190,7 +191,8 @@ export function useAccount(tableRef: Ref) {
           productName: row?.productName ?? "",
           weight: row?.weight ?? null
         },
-        productList: productList?.value ?? null
+        productList: productList?.value ?? null,
+        itemList: itemList?.value ?? [{ key: 1, weight: 0 }]
       },
       width: "46%",
       draggable: true,
@@ -199,8 +201,8 @@ export function useAccount(tableRef: Ref) {
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
-        const curData = options.props.productList
-        console.log(curData)
+        const curData = options.props.itemList;
+        console.log(curData);
         function chores(r) {
           if (r) {
             message(`您${title}了用户名称为${curData.productName}的这条数据`, {
@@ -271,6 +273,7 @@ export function useAccount(tableRef: Ref) {
   });
 
   return {
+    itemList,
     productList,
     form,
     loading,

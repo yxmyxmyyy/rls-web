@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {ref} from "vue";
-import type {FormInstance} from "element-plus";
-import {FormProps} from "@/views/item/utils/types";
+import { ref } from "vue";
+import type { FormInstance } from "element-plus";
+import { FormProps } from "@/views/item/utils/types";
 
 const formRef = ref();
 const props = withDefaults(defineProps<FormProps>(), {
@@ -14,13 +14,14 @@ const props = withDefaults(defineProps<FormProps>(), {
     stock: null,
     weight: null
   }),
-  productList: () => ([])
+  productList: () => [],
+  itemList: () => []
 });
-
+const items = ref(props.itemList);
 const states = ref(props.productList);
 
 function getRef() {
-  console.log(states.value)
+  console.log(states.value);
   return formRef.value;
 }
 
@@ -31,14 +32,14 @@ interface DomainItem {
 }
 
 const removeDomain = (item: DomainItem) => {
-  const index = states.value.indexOf(item);
+  const index = items.value.indexOf(item);
   if (index !== -1) {
-    states.value.splice(index, 1);
+    items.value.splice(index, 1);
   }
 };
 
 const addDomain = () => {
-  states.value.push({
+  items.value.push({
     key: Date.now(),
     productId: "",
     weight: 0
@@ -61,7 +62,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.resetFields();
 };
-defineExpose({getRef});
+defineExpose({ getRef });
 
 //远程查询
 interface ListItem {
@@ -72,20 +73,20 @@ interface ListItem {
 
 const list1 = states.value.map((item): ListItem => {
   const displayText = `${item.productId} - ${item.productName}`;
-  return {value: item.productId, label: displayText, name: item.productName};
+  return { value: item.productId, label: displayText, name: item.productName };
 });
 </script>
 
 <template>
   <el-form
     ref="formRef"
-    :model="states"
+    :model="items"
     class="demo-dynamic"
     label-width="auto"
     style="max-width: 600px"
   >
     <el-form-item
-      v-for="(domain, index) in states"
+      v-for="(domain, index) in items"
       :key="domain.key"
       :label="'Domain' + index"
       :prop="'domains.' + index + '.value'"
@@ -102,10 +103,10 @@ const list1 = states.value.map((item): ListItem => {
       </el-form-item>
 
       <el-form-item label="数量:" prop="weight">
-        <el-input-number v-model="domain.weight" :min="1" :max="9999"/>
+        <el-input-number v-model="domain.weight" :min="1" :max="9999" />
       </el-form-item>
       <el-button class="mt-2" @click.prevent="removeDomain(domain)"
-      >Delete
+        >Delete
       </el-button>
     </el-form-item>
     <el-form-item>

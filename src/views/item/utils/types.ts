@@ -11,6 +11,7 @@ interface FormItemProps {
 interface FormProps {
   formInline: FormItemProps;
   productList: Array<any>;
+  itemList: Array<any>;
 }
 
 export type { FormItemProps, FormProps };
