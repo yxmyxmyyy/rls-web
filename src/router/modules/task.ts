@@ -7,18 +7,18 @@ export default {
   },
   children: [
     {
-      path: "/task/index",
-      name: "task",
-      component: () => import("@/views/task/index.vue"),
+      path: "/taskin/index",
+      name: "taskin",
+      component: () => import("@/views/task/in/index.vue"),
       meta: {
         title: "入库订单",
         roles: ["0"]
       }
     },
     {
-      path: "/product/index",
-      name: "Product",
-      component: () => import("@/views/product/index.vue"),
+      path: "/taskout/index",
+      name: "taskout",
+      component: () => import("@/views/task/out/index.vue"),
       meta: {
         title: "出库订单",
         roles: ["0"]

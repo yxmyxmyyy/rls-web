@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { message } from "@/utils/message";
-import { addDialog } from "@/components/ReDialog";
-import type { FormItemProps } from "../utils/types";
+import { addDialog } from "@/components/ReDialog/index";
+import type { FormItemProps } from "./types";
 import type { PaginationProps } from "@pureadmin/table";
 import { computed, h, onMounted, reactive, ref, type Ref, toRaw } from "vue";
 import {
@@ -15,7 +15,7 @@ import {
   productFindAll
 } from "@/api/item";
 import { getKeyList } from "@pureadmin/utils";
-import { end, Transportin } from "@/api/task";
+import {end, Transportin, Transportout} from "@/api/task";
 
 export function useAccount(tableRef: Ref) {
   const formRef = ref();
@@ -61,7 +61,13 @@ export function useAccount(tableRef: Ref) {
       cellRenderer: ({ row, props }) => (
         <el-tag
           size={props.size}
-          type={row.status === "已完成" ? "success" : null}
+          type={
+            row.status === "已完成"
+              ? "success"
+              : row.status === "已取消"
+                ? "info"
+                : null
+          }
           effect="plain"
         >
           {row.status}
@@ -180,7 +186,7 @@ export function useAccount(tableRef: Ref) {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await Transportin(
+    const { data } = await Transportout(
       toRaw(form),
       pagination.currentPage,
       pagination.pageSize
