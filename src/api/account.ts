@@ -1,5 +1,5 @@
 import { http } from "@/utils/http";
-import { FindResult } from "@/api/types";
+import type { FindResult } from "@/api/types";
 
 // 分页查询
 export const accountFind = (pageNum?: number, pageSize?: number) => {

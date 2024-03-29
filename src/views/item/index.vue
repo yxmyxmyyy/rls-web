@@ -46,7 +46,7 @@ const {
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="库存id：" prop="productId">
+      <el-form-item label="库存id：" prop="itemId">
         <el-input
           v-model="form.itemId"
           placeholder="请输入库存id"

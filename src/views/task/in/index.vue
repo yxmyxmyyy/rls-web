@@ -48,7 +48,7 @@ const {
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="任务id：" prop="productId">
+      <el-form-item label="任务id：" prop="taskId">
         <el-input
           v-model="form.taskId"
           placeholder="请输入任务id"
@@ -64,6 +64,7 @@ const {
           class="!w-[180px]"
         >
           <el-option label="进行中" value="进行中" />
+          <el-option label="待入库" value="待入库" />
           <el-option label="已完成" value="已完成" />
           <el-option label="已取消" value="已取消" />
         </el-select>
@@ -129,6 +130,7 @@ const {
         >
           <template #operation="{ row }">
             <el-popconfirm
+              v-if="row.status === '待入库'"
               :title="`是否入库编号为${row.taskId}的这条订单`"
               @confirm="endTask(row)"
             >

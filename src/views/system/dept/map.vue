@@ -4,6 +4,7 @@ import { FormProps } from "@/views/system/dept/utils/types";
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import house from "@/assets/house.png";
 import { usePublicHooks } from "@/views/system/hooks";
+import ReCol from "@/components/ReCol";
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({

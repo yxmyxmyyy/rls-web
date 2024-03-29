@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
+import ReCol from "@/components/ReCol";
 
 //TODO 表单信息
 const props = withDefaults(defineProps<FormProps>(), {
@@ -56,6 +57,15 @@ function handleChangeClass() {
     :rules="formRules"
     label-width="82px"
   >
+    <re-col :value="12" :xs="24" :sm="24">
+      <el-form-item label="手机号" prop="phone">
+        <el-input
+          v-model="newFormInline.phone"
+          clearable
+          placeholder="请输入手机号"
+        />
+      </el-form-item>
+    </re-col>
     <el-form-item label="产品:" prop="productId">
       <el-select-v2
         ref="optionRefClass"

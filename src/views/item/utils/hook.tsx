@@ -15,11 +15,15 @@ import {
   productFindAll
 } from "@/api/item";
 import { getKeyList } from "@pureadmin/utils";
+import {getDeptList} from "@/api/system";
+import {handleTree} from "@/utils/tree";
+import {newTransport} from "@/api/task";
 
 export function useAccount(tableRef: Ref) {
   const itemList = ref();
   const productList = ref();
   const formRef = ref();
+  const higherDeptOptions = ref();
   const dataList = ref([]);
   const loading = ref(true);
   const selectedNum = ref(0);
@@ -180,15 +184,29 @@ export function useAccount(tableRef: Ref) {
     onSearch();
   };
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  function formatHigherDeptOptions(treeList) {
+    // 根据返回数据的status字段值判断追加是否禁用disabled字段，返回处理后的树结构，用于上级部门级联选择器的展示（实际开发中也是如此，不可能前端需要的每个字段后端都会返回，这时需要前端自行根据后端返回的某些字段做逻辑处理）
+    if (!treeList || !treeList.length) return;
+    const newTreeList = [];
+    for (let i = 0; i < treeList.length; i++) {
+      treeList[i].disabled = treeList[i].status === 0 ? true : false;
+      formatHigherDeptOptions(treeList[i].children);
+      newTreeList.push(treeList[i]);
+    }
+    return newTreeList;
+  }
+
+  function openDialog(title = "入库", row?: FormItemProps) {
     addDialog({
       title: `${title}产品`,
       props: {
         formInline: {
           title,
+          higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
           Item: [],
           productId: row?.productId ?? "",
           productName: row?.productName ?? "",
+          destinationWarehouseId: row?.destinationWarehouseId ?? "",
           weight: row?.weight ?? null
         },
         productList: productList?.value ?? null,
@@ -202,9 +220,15 @@ export function useAccount(tableRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.itemList;
+        const newCurData = {
+          destinationWarehouseId:
+            options.props.formInline.destinationWarehouseId,
+          vehicleLoad: curData
+        };
+        console.log(newCurData);
         function chores(r) {
           if (r) {
-            message(`您${title}了用户名称为${curData.productName}的这条数据`, {
+            message(`已创建订单，请稍后在订单详细查询状态`, {
               type: "success"
             });
           }
@@ -240,7 +264,7 @@ export function useAccount(tableRef: Ref) {
               // ;
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              deductStockItem(curData)
+              newTransport(newCurData)
                 .then(r => {
                   chores(r);
                 })
@@ -269,6 +293,9 @@ export function useAccount(tableRef: Ref) {
 
   onMounted(async () => {
     onSearch();
+
+    const { data } = await getDeptList();
+    higherDeptOptions.value = handleTree(data);
   });
 
   return {

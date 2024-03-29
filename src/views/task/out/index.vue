@@ -48,7 +48,7 @@ const {
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="任务id：" prop="productId">
+      <el-form-item label="任务id：" prop="taskId">
         <el-input
           v-model="form.taskId"
           placeholder="请输入任务id"
@@ -64,6 +64,7 @@ const {
           class="!w-[180px]"
         >
           <el-option label="进行中" value="进行中" />
+          <el-option label="待入库" value="待入库" />
           <el-option label="已完成" value="已完成" />
           <el-option label="已取消" value="已取消" />
         </el-select>
@@ -129,23 +130,7 @@ const {
         >
           <template #operation="{ row }">
             <el-popconfirm
-              :title="`是否入库编号为${row.taskId}的这条订单`"
-              @confirm="endTask(row)"
-            >
-              <template #reference>
-                <el-button
-                  class="reset-margin"
-                  link
-                  type="primary"
-                  :size="size"
-                  :icon="useRenderIcon(Delete)"
-                >
-                  入库
-                </el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :title="`是否确认删除用户编号为${row.id}的这条数据`"
+              :title="`是否确认删除用户编号为${row.taskId}的这条数据`"
               @confirm="handleDelete(row)"
             >
               <template #reference>
@@ -173,7 +158,7 @@ const {
                 <el-dropdown-menu>
                   <el-dropdown-item>
                     <el-popconfirm
-                      :title="`是否确认删除用户编号为${row.id}的这条数据`"
+                      :title="`是否确认删除任务为${row.taskId}的这条数据`"
                       @confirm="handleDelete(row)"
                     >
                       <template #reference>

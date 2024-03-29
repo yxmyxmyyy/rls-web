@@ -33,6 +33,12 @@ export const Transportin = (
   );
 };
 
+export const deleteTask = id => {
+  return http.request<Result>("delete", "/task/Transport/deleteOne/" + id, {
+    withCredentials: true
+  });
+};
+
 /** 结算订单 */
 export const end = id => {
   return http.request<Result>("put", "/task/Transport/end/" + id, {
@@ -40,7 +46,9 @@ export const end = id => {
   });
 };
 
-
+export const newTransport = (data?: object) => {
+  return http.request<Result>("post", "/task/Transport/new", { data });
+};
 
 /** 出库查询 */
 export const Transportout = (

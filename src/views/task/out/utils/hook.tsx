@@ -15,7 +15,7 @@ import {
   productFindAll
 } from "@/api/item";
 import { getKeyList } from "@pureadmin/utils";
-import {end, Transportin, Transportout} from "@/api/task";
+import {deleteTask, end, Transportin, Transportout} from "@/api/task";
 
 export function useAccount(tableRef: Ref) {
   const formRef = ref();
@@ -110,9 +110,9 @@ export function useAccount(tableRef: Ref) {
   }
 
   function handleDelete(row) {
-    deleteProduct(row.productId).then(r => {
+    deleteTask(row.taskId).then(r => {
       if (r) {
-        message(`您删除了产品编号为 ${row.productId} 的这条数据`, {
+        message(`您删除了任务为 ${row.taskId} 的这条数据`, {
           type: "success"
         });
         onSearch();
