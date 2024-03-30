@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ContextProps } from "@/components/ReSplitPane";
+import splitpane, { ContextProps } from "@/components/ReSplitPane";
 import { reactive } from "vue";
 import Amap from "./map";
 
@@ -18,25 +18,6 @@ const settingTB: ContextProps = reactive({
   <el-card>
     <div><Amap /></div>
   </el-card>
-
-
-
-  <!--  <el-card shadow="never">-->
-<!--    <div class="split-pane">-->
-<!--      <splitpane :splitSet="settingTB">-->
-<!--        <template #paneL>-->
-<!--          <el-scrollbar-->
-<!--            ><div class="dv-b"><map /></div-->
-<!--          ></el-scrollbar>-->
-<!--        </template>-->
-<!--        <template #paneR>-->
-<!--          <el-scrollbar>-->
-<!--            <div class="dv-c">C</div>-->
-<!--          </el-scrollbar>-->
-<!--        </template>-->
-<!--      </splitpane>-->
-<!--    </div>-->
-<!--  </el-card>-->
 </template>
 
 <style lang="scss" scoped>

@@ -28,16 +28,42 @@ onBeforeMount(() => {
   const options = {
     viewMode: "3D",
     zoom: 18,
-    center: [114, 30],
+    center: [116.368904, 39.913423],
     resizeEnable: true
   };
   AMapLoader.load({
     key: "e6c8024a88ca88d97889a2f442dc5064", // 使用您的API Key
     version: "2.0",
-    plugins: ["Marker", "AMap.PlaceSearch", "AMap.AutoComplete"] // 加载Marker、Autocomplete和PlaceSearch插件
+    plugins: ["Marker"]
   })
     .then(AMap => {
       map = new AMap.Map(instance.refs.container, options);
+
+      // 绘制行程路径
+      var path = [
+        [116.368904, 39.913423],
+        [116.382122, 39.901176],
+        [116.387271, 39.912501],
+        [116.398258, 39.904600]
+      ];
+      var polyline = new AMap.Polyline({
+        path: path,
+        borderWeight: 2, // 线条宽度，默认为 1
+        strokeColor: 'blue', // 线条颜色
+        lineJoin: 'round' // 折线拐点连接处样式
+      });
+      map.add(polyline);
+
+      // 更新当前位置
+      var marker = new AMap.Marker({
+        position: path[0], // 初始位置
+        map: map
+      });
+
+      // 假设这是从MQTT获得的实时位置数据
+      var newPosition = [117.397428, 39.90923];
+      path.push(newPosition); // 更新路径
+      marker.setPosition(newPosition); // 更新位置
 
       complete();
     })
@@ -55,7 +81,6 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <input id="autocomplete-input" type="text" placeholder="搜索位置..." />
     <div id="container" ref="container" v-loading="mapSet.loading" />
   </div>
 </template>
