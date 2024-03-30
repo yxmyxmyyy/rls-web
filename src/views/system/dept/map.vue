@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AMapLoader from "@amap/amap-jsapi-loader";
 import { FormProps } from "@/views/system/dept/utils/types";
+import { deviceDetection } from "@pureadmin/utils";
 import { onMounted, onUnmounted, reactive, ref } from "vue";
 import house from "@/assets/house.png";
 import { usePublicHooks } from "@/views/system/hooks";
@@ -34,6 +35,19 @@ let selectedPosition = ref({
   lng: newFormInline.value.lng,
   lat: newFormInline.value.lat
 }); // 用于保存选中的位置
+
+const mapSet = reactive({
+  loading: deviceDetection() ? false : true
+});
+
+// 地图创建完成(动画关闭)
+const complete = (): void => {
+  if (map) {
+    map.on("complete", () => {
+      mapSet.loading = false;
+    });
+  }
+};
 
 defineExpose({ getRef });
 
@@ -103,6 +117,8 @@ onMounted(() => {
         placeSearch.setCity(e.poi.adcode);
         placeSearch.search(e.poi.name); //关键字查询查询
       }
+
+      complete();
     })
     .catch(error => {
       console.error("地图加载失败", error);
@@ -119,7 +135,7 @@ onUnmounted(() => {
 <template>
   <div>
     <input id="autocomplete-input" type="text" placeholder="搜索位置..." />
-    <div id="container" />
+    <div id="container" v-loading="mapSet.loading" />
   </div>
 </template>
 

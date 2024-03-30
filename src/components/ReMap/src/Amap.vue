@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, getCurrentInstance, onBeforeMount, onUnmounted } from "vue";
+import { deviceDetection } from "@pureadmin/utils";
 import AMapLoader from "@amap/amap-jsapi-loader";
-import car from "@/assets/car.png"; // 确保这个路径与你的项目结构相匹配
+import car from "@/assets/car.png";
 
 export interface MapConfigureInter {
   on: Fn;
@@ -11,8 +12,11 @@ export interface MapConfigureInter {
   setCenter?: Fn;
   setZoom?: Fn;
   plugin?: Fn;
-  add?: (overlay: any) => void;
 }
+
+defineOptions({
+  name: "Amap"
+});
 
 let MarkerCluster;
 let map: MapConfigureInter;
@@ -20,7 +24,7 @@ let map: MapConfigureInter;
 const instance = getCurrentInstance();
 
 const mapSet = reactive({
-  loading: true
+  loading: deviceDetection() ? false : true
 });
 
 // 地图创建完成(动画关闭)
@@ -34,66 +38,84 @@ const complete = (): void => {
 
 onBeforeMount(() => {
   if (!instance) return;
-
-  // 假设这里是你的地图配置
-  const options = {
-    zoom: 11,
-    center: [116.397428, 39.90923] // 默认中心点坐标，可以根据需要调整
-  };
+  const { MapConfigure } = instance.appContext.config.globalProperties.$config;
+  const { options } = MapConfigure;
 
   AMapLoader.load({
-    key: "e6c8024a88ca88d97889a2f442dc5064", // 使用提供的key
+    key: MapConfigure.amapKey,
     version: "2.0",
     plugins: ["AMap.MarkerCluster"]
   })
     .then(AMap => {
+      // 创建地图实例
       map = new AMap.Map(instance.refs.mapview, options);
 
+      //地图中添加地图操作ToolBar插件
       map.plugin(["AMap.ToolBar", "AMap.MapType"], () => {
         map.addControl(new AMap.ToolBar());
-        map.addControl(new AMap.MapType());
+        //地图类型切换
+        map.addControl(
+          new AMap.MapType({
+            defaultType: 0
+          })
+        );
       });
 
-      // 这里直接使用静态数据代替原来的mapJson获取
-      const points = [
-        {
-          lnglat: [33.397428, 39.90923], // 这里是车辆的位置
-          driver: "司机名字",
-          plateNumber: "车牌号",
-          orientation: 60 // 方向，可以根据实际调整
+      MarkerCluster = new AMap.MarkerCluster(map, [], {
+        // 聚合网格像素大小
+        gridSize: 80,
+        maxZoom: 14,
+        renderMarker(ctx) {
+          const { marker, data } = ctx;
+          if (Array.isArray(data) && data[0]) {
+            const { driver, plateNumber, orientation } = data[0];
+            const content = `<img style="transform: scale(1) rotate(${
+              360 - Number(orientation)
+            }deg);" src='${car}' />`;
+            marker.setContent(content);
+            marker.setLabel({
+              direction: "bottom",
+              //设置文本标注偏移量
+              offset: new AMap.Pixel(-4, 0),
+              //设置文本标注内容
+              content: `<div> ${plateNumber}(${driver})</div>`
+            });
+            marker.setOffset(new AMap.Pixel(-18, -10));
+            marker.on("click", ({ lnglat }) => {
+              map.setZoom(13); //设置地图层级
+              map.setCenter(lnglat);
+            });
+          }
         }
-      ];
-
-      // 创建一个标记点
-      let marker = new AMap.Marker({
-        position: points[0].lnglat,
-        content: `<img style="transform: scale(1) rotate(${360 - Number(points[0].orientation)}deg);" src='${car}' />`,
-        offset: new AMap.Pixel(-18, -10)
       });
 
-      marker.setLabel({
-        direction: "bottom",
-        offset: new AMap.Pixel(-4, 0),
-        content: `<div> ${points[0].plateNumber}(${points[0].driver})</div>`
-      });
-
-      // 将地图中心点设置为汽车的位置
-      map.setCenter(points.map(item => item.lnglat));
-
-      map.add(marker);
+      // // 获取模拟车辆信息
+      // mapJson()
+      //   .then(({ data }) => {
+      //     const points: object = data.map(v => {
+      //       return {
+      //         lnglat: [v.lng, v.lat],
+      //         ...v
+      //       };
+      //     });
+      //     if (MarkerCluster) MarkerCluster.setData(points);
+      //   })
+      //   .catch(err => {
+      //     console.log("err:", err);
+      //   });
 
       complete();
     })
     .catch(() => {
       mapSet.loading = false;
-      throw new Error("地图加载失败，请重新加载");
+      throw "地图加载失败，请重新加载";
     });
 });
 
 onUnmounted(() => {
   if (map) {
-    map.destroy();
-    map.clearEvents();
+    // 销毁地图实例
+    map.destroy() && map.clearEvents("click");
   }
 });
 </script>

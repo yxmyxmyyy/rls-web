@@ -23,6 +23,24 @@ export default {
         title: "出库订单",
         roles: ["0"]
       }
+    },
+    {
+      path: "/mqtt/index",
+      name: "mqtt",
+      component: () => import("@/views/task/detail/mqtt.vue"),
+      meta: {
+        title: "测试",
+        roles: ["0"]
+      }
+    },
+    {
+      path: "/split1/index",
+      name: "split1",
+      component: () => import("@/views/task/detail/split-pane.vue"),
+      meta: {
+        title: "测试1",
+        roles: ["0"]
+      }
     }
   ]
 };

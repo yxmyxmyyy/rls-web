@@ -27,5 +27,13 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "iconify.excludes": ["el"]
+  "iconify.excludes": ["el"],
+  "vsmqtt.brokerProfiles": [
+    {
+      "name": "broker.emqx.io",
+      "host": "broker.emqx.io/mqtt",
+      "port": 1883,
+      "clientId": "vsmqtt_client_db34"
+    }
+  ]
 }
