@@ -12,6 +12,9 @@ import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Role from "@iconify-icons/ri/admin-line";
+import { useDetail } from "../detail/hooks";
+
+const { toDetail, router } = useDetail();
 
 defineOptions({
   name: "Task"
@@ -129,22 +132,25 @@ const {
           @page-current-change="handleCurrentChange"
         >
           <template #operation="{ row }">
-            <el-popconfirm
-              :title="`是否确认删除用户编号为${row.taskId}的这条数据`"
-              @confirm="handleDelete(row)"
+            <el-button
+              class="reset-margin"
+              link
+              type="primary"
+              :size="size"
+              :icon="useRenderIcon(EditPen)"
+              @click="
+                toDetail(
+                  {
+                    id: row.taskId,
+                    o: row.originWarehouseId,
+                    d: row.destinationWarehouseId
+                  },
+                  'query'
+                )
+              "
             >
-              <template #reference>
-                <el-button
-                  class="reset-margin"
-                  link
-                  type="primary"
-                  :size="size"
-                  :icon="useRenderIcon(Delete)"
-                >
-                  详细
-                </el-button>
-              </template>
-            </el-popconfirm>
+              详细
+            </el-button>
             <el-dropdown>
               <el-button
                 class="ml-3 mt-[2px]"

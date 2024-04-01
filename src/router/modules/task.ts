@@ -7,7 +7,7 @@ export default {
   },
   children: [
     {
-      path: "/taskin/index",
+      path: "/task/in",
       name: "taskin",
       component: () => import("@/views/task/in/index.vue"),
       meta: {
@@ -16,7 +16,7 @@ export default {
       }
     },
     {
-      path: "/taskout/index",
+      path: "/task/out",
       name: "taskout",
       component: () => import("@/views/task/out/index.vue"),
       meta: {
@@ -25,21 +25,14 @@ export default {
       }
     },
     {
-      path: "/mqtt/index",
-      name: "mqtt",
-      component: () => import("@/views/task/detail/mqtt.vue"),
+      path: "/task/detail",
+      name: "taskDetail",
+      component: () => import("@/views/task/detail/index.vue"),
       meta: {
-        title: "测试",
-        roles: ["0"]
-      }
-    },
-    {
-      path: "/split1/index",
-      name: "split1",
-      component: () => import("@/views/task/detail/split-pane.vue"),
-      meta: {
-        title: "测试1",
-        roles: ["0"]
+        // 不在menu菜单中显示
+        showLink: false,
+        activePath: "/task/detail",
+        roles: ["2"]
       }
     }
   ]

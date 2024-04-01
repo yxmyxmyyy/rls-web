@@ -1,13 +1,36 @@
 <script setup lang="ts">
 import AMapLoader from "@amap/amap-jsapi-loader";
 import { deviceDetection } from "@pureadmin/utils";
-import { getCurrentInstance, onBeforeMount, onUnmounted, reactive } from "vue";
+import {
+  getCurrentInstance,
+  onBeforeMount,
+  onUnmounted,
+  reactive,
+  defineProps,
+  watch,
+  ref,
+  toRaw
+} from "vue";
+import car from "@/assets/car.png";
 
 defineOptions({
   name: "Amap"
 });
 
+const props = defineProps({
+  location: Array,
+  dataList: Array,
+  destination: Object,
+  origin: Object
+});
+
+let list = ref(props.dataList);
 let map = null;
+let polyline = null;
+let arrowMarker = null;
+let driving = null;
+const startLngLat = props.origin.value._rawValue; //起始点坐标
+const endLngLat = props.destination.value._rawValue; //终点坐标
 
 const instance = getCurrentInstance();
 
@@ -24,46 +47,79 @@ const complete = (): void => {
   }
 };
 
+const createDrivingRoute = () => {
+  if (map && props.origin && props.destination) {
+    if (driving) {
+      driving.clear();
+    }
+    driving = new AMap.Driving({
+      map: map
+    });
+    // Search for a route from origin to destination
+    driving.search(startLngLat, endLngLat, (status, result) => {
+      if (status === "complete" && result.routes && result.routes.length) {
+        console.log("Driving route created successfully");
+      } else {
+        console.error("Failed to create driving route");
+      }
+    });
+  }
+};
+
+const updateMapLocation = newLocation => {
+  // 确保地图和新位置都存在
+  if (map && newLocation && newLocation.length === 2) {
+    // 更新地图中心点到新位置
+    map.setCenter(newLocation);
+
+    list.value.push(newLocation);
+
+    // 更新箭头标记位置
+    if (arrowMarker) {
+      arrowMarker.setPosition(newLocation);
+    } else {
+      arrowMarker = new AMap.Marker({
+        position: newLocation,
+        content: `<img src='${car}'>`,
+        offset: new AMap.Pixel(-12, -12)
+      });
+      map.add(arrowMarker);
+    }
+
+    // 如果存在折线，则更新路径
+    if (polyline) {
+      polyline.setPath(list.value);
+    } else {
+      polyline = new AMap.Polyline({
+        path: props.dataList,
+        strokeColor: "#3366FF",
+        strokeOpacity: 1,
+        strokeWeight: 5,
+        strokeStyle: "solid",
+        zIndex: 101
+      });
+      map.add(polyline);
+    }
+  }
+};
+
 onBeforeMount(() => {
   const options = {
     viewMode: "3D",
     zoom: 18,
-    center: [116.368904, 39.913423],
+    center: list.value[list.value.length - 1],
     resizeEnable: true
   };
   AMapLoader.load({
-    key: "e6c8024a88ca88d97889a2f442dc5064", // 使用您的API Key
+    key: "e6c8024a88ca88d97889a2f442dc5064",
     version: "2.0",
-    plugins: ["Marker"]
+    plugins: ["Marker", "AMap.Driving"]
   })
     .then(AMap => {
       map = new AMap.Map(instance.refs.container, options);
+      createDrivingRoute();
 
-      // 绘制行程路径
-      var path = [
-        [116.368904, 39.913423],
-        [116.382122, 39.901176],
-        [116.387271, 39.912501],
-        [116.398258, 39.904600]
-      ];
-      var polyline = new AMap.Polyline({
-        path: path,
-        borderWeight: 2, // 线条宽度，默认为 1
-        strokeColor: 'blue', // 线条颜色
-        lineJoin: 'round' // 折线拐点连接处样式
-      });
-      map.add(polyline);
-
-      // 更新当前位置
-      var marker = new AMap.Marker({
-        position: path[0], // 初始位置
-        map: map
-      });
-
-      // 假设这是从MQTT获得的实时位置数据
-      var newPosition = [117.397428, 39.90923];
-      path.push(newPosition); // 更新路径
-      marker.setPosition(newPosition); // 更新位置
+      updateMapLocation(list.value[list.value.length - 1]);
 
       complete();
     })
@@ -73,10 +129,16 @@ onBeforeMount(() => {
 });
 onUnmounted(() => {
   if (map) {
-    // 销毁地图实例
     map.destroy() && map.clearEvents("click");
   }
 });
+watch(
+  () => props.location,
+  newLocation => {
+    updateMapLocation(newLocation);
+  },
+  { deep: true }
+);
 </script>
 
 <template>

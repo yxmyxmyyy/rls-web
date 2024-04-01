@@ -158,7 +158,7 @@ const handleChangeClass = (productId: string, domainItem: DomainItem) => {
           </el-form-item>
         </re-col>
         <re-col :sm="24" :value="12" :xs="24">
-          <el-button type="warning" @click.prevent="removeDomain(domain)"
+          <el-button plain type="danger" @click.prevent="removeDomain(domain)"
             >删除</el-button
           >
         </re-col>

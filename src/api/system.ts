@@ -58,6 +58,11 @@ export const deleteUser = id => {
 };
 
 /** 获取部门管理列表 */
+export const getDept = id => {
+  return http.request<Result>("get", "/system/warehouse/findOne/" + id);
+};
+
+/** 获取部门管理列表 */
 export const getDeptList = (data?: object) => {
   return http.request<Result>("post", "/system/warehouse/findAll", { data });
 };

@@ -206,6 +206,7 @@ export function useAccount(tableRef: Ref) {
           Item: [],
           productId: row?.productId ?? "",
           productName: row?.productName ?? "",
+          originWarehouseId: row?.originWarehouseId ?? "",
           destinationWarehouseId: row?.destinationWarehouseId ?? "",
           weight: row?.weight ?? null
         },
