@@ -67,7 +67,6 @@ const {
           class="!w-[180px]"
         >
           <el-option label="进行中" value="进行中" />
-          <el-option label="待入库" value="待入库" />
           <el-option label="已完成" value="已完成" />
           <el-option label="已取消" value="已取消" />
         </el-select>

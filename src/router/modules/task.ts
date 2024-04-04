@@ -12,7 +12,7 @@ export default {
       component: () => import("@/views/task/in/index.vue"),
       meta: {
         title: "入库订单",
-        roles: ["0"]
+        roles: ["0", "1", "2", "3"]
       }
     },
     {
@@ -21,7 +21,7 @@ export default {
       component: () => import("@/views/task/out/index.vue"),
       meta: {
         title: "出库订单",
-        roles: ["0"]
+        roles: ["0", "1", "2", "3"]
       }
     },
     {
@@ -32,7 +32,7 @@ export default {
         // 不在menu菜单中显示
         showLink: false,
         activePath: "/task/detail",
-        roles: ["2"]
+        roles: ["0", "1", "2", "3"]
       }
     }
   ]

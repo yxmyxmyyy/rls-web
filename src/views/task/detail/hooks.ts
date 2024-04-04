@@ -6,9 +6,10 @@ import {
   type LocationQueryRaw,
   type RouteParamsRaw
 } from "vue-router";
-import { ref, toRaw } from "vue";
+import { ref } from "vue";
 import { vehicleLogs } from "@/api/vehicle";
 import { getDept } from "@/api/system";
+import { findByTaskId } from "@/api/task";
 
 export function useDetail() {
   const route = useRoute();
@@ -17,6 +18,7 @@ export function useDetail() {
   const dataList = ref();
   const loading = ref(true);
   const houseLocation = ref();
+  const loadList = ref();
 
   async function onSearch(taskId: string) {
     loading.value = true;
@@ -28,10 +30,23 @@ export function useDetail() {
     }, 500);
   }
 
+  async function LoadSearch(id) {
+    loading.value = true;
+    const { data } = await findByTaskId(id);
+    loadList.value = data;
+    console.log(loadList.value);
+
+    setTimeout(() => {
+      loading.value = false;
+    }, 500);
+  }
+
   async function locationSearch(id) {
     loading.value = true;
-    const { data } = await getDept(id);
-    houseLocation.value = [data.lng, data.lat];
+    const {
+      data: { lat, lng }
+    } = await getDept(id);
+    houseLocation.value = [lng, lat];
 
     setTimeout(() => {
       loading.value = false;
@@ -96,6 +111,8 @@ export function useDetail() {
     dataList,
     loading,
     onSearch,
+    LoadSearch,
+    loadList,
     locationSearch,
     houseLocation
   };

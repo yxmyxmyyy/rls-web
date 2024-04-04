@@ -68,30 +68,39 @@ const createDrivingRoute = () => {
 
 const updateMapLocation = newLocation => {
   // 确保地图和新位置都存在
-  if (map && newLocation && newLocation.length === 2) {
+  if (map && newLocation && newLocation.length >= 3) {
+    // 确认包含温度信息
+    const location = [newLocation[0], newLocation[1]]; // 提取经纬度
+    const temperature = newLocation[2]; // 提取温度
+
     // 更新地图中心点到新位置
-    map.setCenter(newLocation);
+    map.setCenter(location);
 
-    list.value.push(newLocation);
+    list.value.push(newLocation); // 现在保存包含温度的完整数据
 
-    // 更新箭头标记位置
+    // 更新箭头标记位置和温度标签
     if (arrowMarker) {
-      arrowMarker.setPosition(newLocation);
+      arrowMarker.setPosition(location);
+      arrowMarker.setContent(
+        `<div><img src='${car}'><div style="text-align: center">${temperature}°C</div></div>`
+      ); // 更新内容包含温度
     } else {
       arrowMarker = new AMap.Marker({
-        position: newLocation,
-        content: `<img src='${car}'>`,
+        position: location,
+        content: `<div><img src='${car}'><div style="text-align: center">${temperature}°C</div></div>`, // 初始化内容包含温度
         offset: new AMap.Pixel(-12, -12)
       });
       map.add(arrowMarker);
     }
 
-    // 如果存在折线，则更新路径
+    // 如果存在折线，则更新路径（只使用经纬度）
     if (polyline) {
-      polyline.setPath(list.value);
+      const path = list.value.map(item => [item[0], item[1]]); // 仅提取经纬度用于路径
+      polyline.setPath(path);
     } else {
+      const path = props.dataList.map(item => [item[0], item[1]]); // 初始化路径，仅提取经纬度
       polyline = new AMap.Polyline({
-        path: props.dataList,
+        path: path,
         strokeColor: "#3366FF",
         strokeOpacity: 1,
         strokeWeight: 5,

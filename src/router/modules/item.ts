@@ -12,7 +12,7 @@ export default {
       component: () => import("@/views/item/index.vue"),
       meta: {
         title: "库存管理",
-        roles: ["0"]
+        roles: ["0", "1", "2", "3"]
       }
     },
     {
@@ -21,7 +21,7 @@ export default {
       component: () => import("@/views/product/index.vue"),
       meta: {
         title: "产品管理",
-        roles: ["0"]
+        roles: ["0", "1", "2", "3"]
       }
     }
   ]

@@ -12,7 +12,8 @@ import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import Role from "@iconify-icons/ri/admin-line";
-
+import { useDetail } from "@/views/task/detail/hooks";
+const { toDetail, router } = useDetail();
 defineOptions({
   name: "Task"
 });
@@ -64,7 +65,6 @@ const {
           class="!w-[180px]"
         >
           <el-option label="进行中" value="进行中" />
-          <el-option label="待入库" value="待入库" />
           <el-option label="已完成" value="已完成" />
           <el-option label="已取消" value="已取消" />
         </el-select>
@@ -130,7 +130,7 @@ const {
         >
           <template #operation="{ row }">
             <el-popconfirm
-              v-if="row.status === '待入库'"
+              v-if="row.status === '进行中'"
               :title="`是否入库编号为${row.taskId}的这条订单`"
               @confirm="endTask(row)"
             >
@@ -146,22 +146,25 @@ const {
                 </el-button>
               </template>
             </el-popconfirm>
-            <el-popconfirm
-              :title="`是否确认删除用户编号为${row.id}的这条数据`"
-              @confirm="handleDelete(row)"
+            <el-button
+              class="reset-margin"
+              link
+              type="primary"
+              :size="size"
+              :icon="useRenderIcon(EditPen)"
+              @click="
+                toDetail(
+                  {
+                    id: row.taskId,
+                    o: row.originWarehouseId,
+                    d: row.destinationWarehouseId
+                  },
+                  'query'
+                )
+              "
             >
-              <template #reference>
-                <el-button
-                  class="reset-margin"
-                  link
-                  type="primary"
-                  :size="size"
-                  :icon="useRenderIcon(Delete)"
-                >
-                  详细
-                </el-button>
-              </template>
-            </el-popconfirm>
+              详细
+            </el-button>
             <el-dropdown>
               <el-button
                 class="ml-3 mt-[2px]"
@@ -175,7 +178,7 @@ const {
                 <el-dropdown-menu>
                   <el-dropdown-item>
                     <el-popconfirm
-                      :title="`是否确认删除用户编号为${row.id}的这条数据`"
+                      :title="`是否确认删除任务为${row.taskId}的这条数据`"
                       @confirm="handleDelete(row)"
                     >
                       <template #reference>

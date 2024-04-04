@@ -62,3 +62,19 @@ export const Transportout = (
     { data }
   );
 };
+
+export const findByTaskId = id => {
+  return http.request<Result>("get", "/task/VehicleLoad/findByTaskId/" + id);
+};
+
+export const count = () => {
+  return http.request<Result>("get", "/task/Statistic/count");
+};
+
+export const weekcount = () => {
+  return http.request<Result>("get", "/task/Statistic/weekCount");
+};
+
+export const findAllProductStocks = () => {
+  return http.request<Result>("get", "/task/Statistic/findAllProductStocks");
+};

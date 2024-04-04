@@ -28,12 +28,13 @@ export default {
       }
     },
     {
-      path: "/able/map",
-      name: "MapPage",
-      component: () => import("@/views/system/map/map.vue"),
+      path: "/system/vehicle/index",
+      name: "VehicleDept",
+      component: () => import("@/views/vehicle/index.vue"),
       meta: {
-        title: "地图",
-        icon: "ri:git-branch-line"
+        icon: "ri:git-branch-line",
+        title: "车辆管理",
+        roles: ["0"]
       }
     }
   ]

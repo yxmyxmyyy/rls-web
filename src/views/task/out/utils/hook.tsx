@@ -123,7 +123,7 @@ export function useAccount(tableRef: Ref) {
   function endTask(row) {
     end(row.taskId).then(r => {
       if (r) {
-        message(`您入库了产品编号为 ${row.taskId} 的这条订单`, {
+        message(`您出库了产品编号为 ${row.taskId} 的这条订单`, {
           type: "success"
         });
         onSearch();

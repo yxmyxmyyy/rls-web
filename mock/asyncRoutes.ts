@@ -11,7 +11,9 @@ const permissionRouter = {
   meta: {
     title: "权限管理",
     icon: "ep:lollipop",
-    rank: 10
+    rank: 10,
+    roles: ["10"],
+    showLink: false
   },
   children: [
     {
