@@ -105,11 +105,7 @@ const {
         </el-form-item>
       </el-form>
 
-      <PureTableBar
-        title="用户管理（仅演示，操作后不生效）"
-        :columns="columns"
-        @refresh="onSearch"
-      >
+      <PureTableBar title="用户管理" :columns="columns" @refresh="onSearch">
         <template #buttons>
           <el-button
             type="primary"

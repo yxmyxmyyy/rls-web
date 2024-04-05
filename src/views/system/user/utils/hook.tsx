@@ -171,6 +171,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       }
     )
       .then(() => {
+        const data = {
+          id: row.id,
+          status: row.status
+        };
+        addOrUpdateUser(data);
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
@@ -306,7 +311,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           username: row?.username ?? "",
           password: row?.password ?? "",
           warehouseId: row?.warehouseId ?? "",
-          role: row?.role ?? "",
+          roles: row?.roles ?? "",
           phone: row?.phone ?? "",
           sex: row?.sex ?? "",
           status: row?.status ?? 1,

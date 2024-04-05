@@ -46,7 +46,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div v-if="loading">
+  <div v-if="loading" v-loading="!loading">
     <el-row :gutter="24" justify="space-around">
       <re-col
         v-for="(item, index) in chartData"

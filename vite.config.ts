@@ -27,25 +27,25 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       proxy: {
         "/system": {
           // 这里填写后端地址
-          target: "http://127.0.0.1:6061",
+          target: "http://127.0.0.1:5050",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/system/, "")
         },
         "/item": {
           // 这里填写后端地址
-          target: "http://127.0.0.1:6062",
+          target: "http://127.0.0.1:5050",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/item/, "")
         },
         "/task": {
           // 这里填写后端地址
-          target: "http://127.0.0.1:6063",
+          target: "http://127.0.0.1:5050",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/task/, "")
         },
         "/vehicle": {
           // 这里填写后端地址
-          target: "http://127.0.0.1:6064",
+          target: "http://127.0.0.1:5050",
           changeOrigin: true,
           rewrite: path => path.replace(/^\/vehicle/, "")
         }

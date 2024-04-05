@@ -1,5 +1,5 @@
 interface FormItemProps {
-  role: number;
+  roles: number;
   warehouseId: number;
   id?: string;
   /** 用于判断是`新增`还是`修改` */

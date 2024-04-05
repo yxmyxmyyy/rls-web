@@ -16,7 +16,7 @@ const props = withDefaults(defineProps<FormProps>(), {
     phone: "",
     sex: "",
     status: 1,
-    role: null,
+    roles: null,
     warehouseId: null
   })
 });
@@ -62,7 +62,7 @@ function handleCascaderChange(selectedPath) {
         break;
     }
   }
-  newFormInline.value.role = type;
+  newFormInline.value.roles = type;
   newFormInline.value.warehouseId = parentId;
 }
 
@@ -195,7 +195,7 @@ onMounted(() => {
         <el-form-item label="类型" prop="type">
           <!-- 使用:value绑定转换后的文本 -->
           <el-input
-            :value="convertTypeToText(newFormInline.role)"
+            :value="convertTypeToText(newFormInline.roles)"
             readonly
             placeholder="类型"
           />
