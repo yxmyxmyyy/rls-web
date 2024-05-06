@@ -78,3 +78,9 @@ export const addOrUpdateDept = (data?: object) => {
 export const deleteDept = (data?: object) => {
   return http.request<Result>("delete", "/system/warehouse/delete", { data });
 };
+
+/** 根据token查找用户信息 */
+/** 获取部门管理列表 */
+export const getDeptByToken = () => {
+  return http.request<Result>("get", "/system/warehouse/findByToken");
+};

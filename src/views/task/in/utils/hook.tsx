@@ -15,7 +15,7 @@ import {
   productFindAll
 } from "@/api/item";
 import { getKeyList } from "@pureadmin/utils";
-import {deleteTask, end, Transportin} from "@/api/task";
+import { deleteTask, end, Transportin } from "@/api/task";
 
 export function useAccount(tableRef: Ref) {
   const formRef = ref();
@@ -66,7 +66,9 @@ export function useAccount(tableRef: Ref) {
               ? "success"
               : row.status === "已取消"
                 ? "info"
-                : null
+                : row.status === "进行中"
+                  ? "primary"
+                  : "danger"
           }
           effect="plain"
         >
@@ -78,14 +80,14 @@ export function useAccount(tableRef: Ref) {
       label: "创建时间",
       minWidth: 90,
       prop: "createdAt",
-      formatter: ({ createdAt }) =>
+      formatter: ({createdAt}) =>
         dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "更新时间",
       minWidth: 90,
       prop: "updatedAt",
-      formatter: ({ updatedAt }) =>
+      formatter: ({updatedAt}) =>
         dayjs(updatedAt).format("YYYY-MM-DD HH:mm:ss")
     },
     {

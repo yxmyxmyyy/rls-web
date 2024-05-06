@@ -66,7 +66,9 @@ export function useAccount(tableRef: Ref) {
               ? "success"
               : row.status === "已取消"
                 ? "info"
-                : null
+                : row.status === "进行中"
+                  ? "primary"
+                  : "danger"
           }
           effect="plain"
         >

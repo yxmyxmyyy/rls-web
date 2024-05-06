@@ -132,7 +132,7 @@ const {
         >
           <template #operation="{ row }">
             <el-popconfirm
-              :title="`是否确认删除用户编号为${row.productId}的这条数据`"
+              :title="`是否确认删除产品编号为${row.productId}的这条数据`"
               @confirm="handleDelete(row)"
             >
               <template #reference>
